@@ -4,12 +4,12 @@ RAPPORT D'ÉVALUATION - CENTRALE 2
 ============================================================
 
 📊 PERFORMANCES GLOBALES :
-   - Accuracy : 100.00%
-   - F1-Score : 1.0000
-   - ROC-AUC  : 1.0000
+   - Accuracy : 89.11%
+   - F1-Score : 0.7437
+   - ROC-AUC  : 0.9502
 
 🩺 INTERPRÉTATION :
-   Le modèle est EXCELLENT
+   Le modèle est BON
    pour la détection des pics de puissance.
 
 📁 FICHIERS GÉNÉRÉS :

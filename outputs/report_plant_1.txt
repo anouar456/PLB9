@@ -4,9 +4,9 @@ RAPPORT D'ÉVALUATION - CENTRALE 1
 ============================================================
 
 📊 PERFORMANCES GLOBALES :
-   - Accuracy : 100.00%
-   - F1-Score : 1.0000
-   - ROC-AUC  : 1.0000
+   - Accuracy : 98.58%
+   - F1-Score : 0.9693
+   - ROC-AUC  : 0.9973
 
 🩺 INTERPRÉTATION :
    Le modèle est EXCELLENT
