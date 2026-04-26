@@ -417,4 +417,4 @@ if __name__ == "__main__":
     if X_train_1 is not None:
         print(f"\n📊 Centrale 1 - Train shape : {X_train_1.shape}, Test shape : {X_test_1.shape}")
     if X_train_2 is not None:
-        print(f"📊 Centrale 2 - Train shape : {X_train_2.shape}, Test shape : {X_test_2.shape} ")
+        print(f"📊 Centrale 2 - Train shape : {X_train_2.shape}, Test shape : {X_test_2.shape}")
