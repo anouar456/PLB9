@@ -1,7 +1,7 @@
 """
 train_model.py
 --------------
-Entraîne 3 modèles ML pour la  prédiction des pics de puissance solaire :
+Entraîne 3 modèles ML pour la prédiction des pics de puissance solaire :
 - Random Forest
 - XGBoost
 - LightGBM
