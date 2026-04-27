@@ -210,6 +210,8 @@ def get_coach_recommendations(battery, panels, charge):
 # EN-TÊTE PRINCIPAL
 # ============================================
 
+st.title("🔄 UPDATED UI VERSION - DEBUG CONFIRMATION")
+
 st.markdown("""
 <div class="main-header">
     <h1 style="display: inline-block;">🔋 Durasia</h1>
