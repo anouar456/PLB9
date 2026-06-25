@@ -1,0 +1,4 @@
+# Dépendances Raspberry Pi (acquisition + API)
+adafruit-circuitpython-ads1x15>=2.2.0
+Flask>=3.0.0
+flask-cors>=4.0.0

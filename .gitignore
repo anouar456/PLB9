@@ -1,0 +1,14 @@
+# Données runtime du Raspberry Pi
+raspberry/data/latest.json
+raspberry/data/mesures.csv
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

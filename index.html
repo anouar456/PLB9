@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DURASIA — Supervision Photovoltaïque Intelligente</title>
+<meta name="description" content="DURASIA : supervision intelligente d'un système photovoltaïque autonome, durable et optimisé par IA pour les zones isolées.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f7faf8; --bg2:#eef5ef; --surface:#ffffff; --surface-2:#fbfdfb;
+  --ink:#11241b; --ink-soft:#52635a; --ink-faint:#8a988f;
+  --line:rgba(17,36,27,.07); --line-2:rgba(17,36,27,.12);
+  --green:#15a05a; --green-d:#0c7a43; --green-deep:#0f2e22;
+  --mint:#e7f5ec; --mint-2:#f1f9f3;
+  --amber:#f3a833; --amber-d:#e08a13; --amber-soft:#fdf3e1;
+  --blue:#2f8fd6; --red:#e2554b; --rad:22px;
+  --shadow-s:0 1px 2px rgba(15,46,34,.05), 0 1px 3px rgba(15,46,34,.04);
+  --shadow-m:0 6px 18px rgba(15,46,34,.06), 0 2px 6px rgba(15,46,34,.04);
+  --shadow-l:0 24px 60px rgba(15,46,34,.12), 0 8px 24px rgba(15,46,34,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(900px 600px at 12% -8%, rgba(21,160,90,.10), transparent 60%),
+  radial-gradient(800px 600px at 100% 0%, rgba(243,168,51,.10), transparent 55%),
+  radial-gradient(700px 700px at 50% 120%, rgba(47,143,214,.06), transparent 60%),
+  linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);}
+h1,h2,h3,h4,.font-d{font-family:'Manrope',sans-serif;letter-spacing:-.01em}
+.wrap{max-width:1240px;margin:0 auto;padding:0 22px}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(17,36,27,.18);border-radius:8px}
+::selection{background:rgba(21,160,90,.18)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);box-shadow:var(--shadow-s);transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s}
+.card.lift:hover{transform:translateY(-5px);box-shadow:var(--shadow-l)}
+.glass{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.6)}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:999px}
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:14px;padding:11px 18px;border-radius:14px;border:none;cursor:pointer;transition:.25s;font-family:inherit}
+.btn-pri{background:linear-gradient(135deg,var(--green) 0%,var(--green-d) 100%);color:#fff;box-shadow:0 8px 20px rgba(21,160,90,.28)}
+.btn-pri:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(21,160,90,.34)}
+.btn-ghost{background:var(--mint);color:var(--green-deep)}
+.btn-ghost:hover{background:#daf0e0}
+.live-dot{position:relative;width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+.live-dot::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--green);animation:ping 1.8s cubic-bezier(0,0,.2,1) infinite}
+@keyframes ping{0%{transform:scale(.6);opacity:1}80%,100%{transform:scale(2.1);opacity:0}}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.section-title{font-size:21px;font-weight:800;color:var(--green-deep);display:flex;align-items:center;gap:11px}
+.section-title .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:15px}
+.muted{color:var(--ink-soft)}
+.kbig{font-family:'Manrope';font-weight:800;line-height:1;letter-spacing:-.02em}
+.gauge-track{stroke:rgba(17,36,27,.08)}
+.shimmer{position:relative;overflow:hidden}
+.shimmer::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-100%);animation:sh 3.4s infinite}
+@keyframes sh{100%{transform:translateX(100%)}}
+.tooltip-soft{transition:.3s}
+/* segmented */
+.seg{display:inline-flex;background:var(--mint);border-radius:12px;padding:4px;gap:3px}
+.seg button{border:none;background:transparent;font-family:inherit;font-weight:600;font-size:13px;color:var(--ink-soft);padding:7px 14px;border-radius:9px;cursor:pointer;transition:.25s}
+.seg button.active{background:#fff;color:var(--green-deep);box-shadow:var(--shadow-s)}
+/* floating windows */
+.fwin{position:fixed;z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow-l);display:flex;flex-direction:column;opacity:0;transform:translateY(20px) scale(.96);pointer-events:none;transition:opacity .3s,transform .35s cubic-bezier(.2,.7,.2,1)}
+.fwin.open{opacity:1;transform:none;pointer-events:all}
+.fab{position:fixed;z-index:55;width:58px;height:58px;border-radius:18px;border:none;cursor:pointer;color:#fff;display:grid;place-items:center;font-size:20px;box-shadow:var(--shadow-l);transition:.3s}
+.fab:hover{transform:translateY(-3px) scale(1.05)}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:ty 1.3s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes ty{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:18px;opacity:0;pointer-events:none;transition:.3s}
+.modal.open{opacity:1;pointer-events:all}
+.modal-bg{position:absolute;inset:0;background:rgba(15,46,34,.4);backdrop-filter:blur(5px)}
+input,textarea{font-family:inherit}
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-120%);z-index:100;background:var(--green-deep);color:#fff;padding:13px 20px;border-radius:14px;font-size:14px;font-weight:500;box-shadow:var(--shadow-l);transition:transform .4s cubic-bezier(.2,.7,.2,1);display:flex;align-items:center;gap:10px}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:720px){.wrap{padding:0 14px}}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login" class="modal open" style="background:transparent">
+  <div class="modal-bg" style="background:linear-gradient(135deg,rgba(15,46,34,.62),rgba(224,138,19,.34)),url('https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80');background-size:cover;background-position:center;backdrop-filter:none"></div>
+  <div class="card" style="position:relative;width:100%;max-width:410px;padding:38px 32px;border-radius:28px">
+    <div style="text-align:center;margin-bottom:26px">
+      <div style="width:66px;height:66px;border-radius:20px;margin:0 auto 16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--green),var(--amber));box-shadow:0 12px 28px rgba(21,160,90,.32)">
+        <i class="fas fa-solar-panel" style="color:#fff;font-size:26px"></i>
+      </div>
+      <h1 style="font-size:30px;font-weight:800;color:var(--green-deep)">DURASIA</h1>
+      <p class="muted" style="font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;margin-top:5px">Énergie solaire durable &amp; intelligente</p>
+    </div>
+    <label class="muted" style="font-size:13px;font-weight:600">Identifiant système</label>
+    <div style="position:relative;margin:7px 0 15px">
+      <i class="fas fa-microchip" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--green)"></i>
+      <input id="loginId" value="DUR-2026-001" style="width:100%;padding:13px 14px 13px 42px;border:1px solid var(--line-2);border-radius:13px;font-size:14px;outline:none;background:var(--surface-2)">
+    </div>
+    <label class="muted" style="font-size:13px;font-weight:600">Mot de passe</label>
+    <div style="position:relative;margin:7px 0 22px">
+      <i class="fas fa-lock" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--green)"></i>
+      <input id="loginPw" type="password" value="durasia" style="width:100%;padding:13px 14px 13px 42px;border:1px solid var(--line-2);border-radius:13px;font-size:14px;outline:none;background:var(--surface-2)">
+    </div>
+    <button class="btn btn-pri" style="width:100%;justify-content:center;padding:14px" onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> Accéder au tableau de bord</button>
+    <p class="muted" style="text-align:center;font-size:12px;margin-top:16px">Démo — identifiants pré-remplis. <a onclick="doLogin()" style="color:var(--green);font-weight:600;cursor:pointer">Entrer directement</a></p>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" style="display:none">
+
+<!-- header -->
+<header class="glass" style="position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line)">
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 22px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--green),var(--amber));box-shadow:0 8px 18px rgba(21,160,90,.28)">
+        <i class="fas fa-solar-panel" style="color:#fff"></i>
+      </div>
+      <div>
+        <div style="font-family:Manrope;font-weight:800;font-size:18px;color:var(--green-deep);line-height:1">DURASIA</div>
+        <div class="muted" style="font-size:11px;letter-spacing:.1em">SUPERVISION PV INTELLIGENTE</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="pill" style="background:var(--mint);color:var(--green-deep)" id="locPill"><i class="fas fa-location-dot" style="color:var(--amber-d)"></i> Béni Mellal, MA</div>
+      <div class="seg" id="modeSeg">
+        <button class="active" onclick="setMode('demo')"><i class="fas fa-play" style="font-size:11px"></i> Démo</button>
+        <button onclick="setMode('live')"><i class="fas fa-wifi" style="font-size:11px"></i> Live</button>
+      </div>
+      <div class="pill" id="statusPill" style="background:#eafaf0;color:var(--green-d)"><span class="live-dot"></span> Système actif</div>
+      <button class="btn btn-ghost" onclick="openSettings()" title="Réglages"><i class="fas fa-sliders"></i></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" style="padding:26px 22px 120px">
+
+  <!-- AI banner -->
+  <div class="reveal card lift" style="padding:20px 22px;background:linear-gradient(120deg,#13301f,#1c5234);color:#fff;border:none;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(243,168,51,.4),transparent 65%)"></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative">
+      <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.14);display:grid;place-items:center;flex-shrink:0"><i class="fas fa-wand-magic-sparkles" style="color:var(--amber)"></i></div>
+      <div style="flex:1;min-width:240px">
+        <div style="display:flex;gap:9px;align-items:center;margin-bottom:5px">
+          <span class="pill" style="background:rgba(243,168,51,.22);color:var(--amber);padding:3px 10px;font-size:11px">RECOMMANDATION IA</span>
+          <span style="font-size:11.5px;opacity:.6" id="aiTime">à l'instant</span>
+        </div>
+        <p id="aiReco" style="font-size:14.5px;line-height:1.55;opacity:.95">Analyse des conditions en cours…</p>
+      </div>
+      <button class="btn" style="background:rgba(255,255,255,.16);color:#fff" onclick="document.getElementById('predSec').scrollIntoView()"><i class="fas fa-chart-line"></i> Prévisions</button>
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:18px" id="kpiRow"></div>
+
+  <!-- Production chart -->
+  <div class="reveal card" style="padding:22px;margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:6px">
+      <div class="section-title"><span class="ic" style="background:var(--mint);color:var(--green)"><i class="fas fa-bolt"></i></span> Production en temps réel</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span class="muted" style="font-size:12.5px"><span class="live-dot"></span> &nbsp;Données mesurées — prototype</span>
+        <span id="clock" class="pill" style="background:var(--surface-2);border:1px solid var(--line);color:var(--green-deep)">--:--</span>
+      </div>
+    </div>
+    <canvas id="prodChart" height="118"></canvas>
+  </div>
+
+  <!-- Sensors -->
+  <div class="reveal" style="margin-top:26px">
+    <div class="section-title" style="margin-bottom:14px"><span class="ic" style="background:var(--amber-soft);color:var(--amber-d)"><i class="fas fa-gauge-high"></i></span> Capteurs système (live)</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(218px,1fr));gap:16px" id="sensorRow"></div>
+  </div>
+
+  <!-- Two col: sun arc + environment -->
+  <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin-top:26px" id="twoCol">
+    <div class="reveal card" style="padding:22px">
+      <div class="section-title" style="font-size:18px;margin-bottom:6px"><span class="ic" style="background:var(--amber-soft);color:var(--amber-d)"><i class="fas fa-sun"></i></span> Course du soleil</div>
+      <p class="muted" style="font-size:12.5px;margin-bottom:8px">Élévation solaire &amp; irradiance ciel clair</p>
+      <div id="sunArc"></div>
+      <div style="display:flex;justify-content:space-around;margin-top:10px;text-align:center">
+        <div><div class="kbig" style="font-size:22px;color:var(--green-deep)" id="elevVal">–</div><div class="muted" style="font-size:11px">Élévation</div></div>
+        <div><div class="kbig" style="font-size:22px;color:var(--amber-d)" id="ghiVal">–</div><div class="muted" style="font-size:11px">GHI W/m²</div></div>
+        <div><div class="kbig" style="font-size:22px;color:var(--blue)" id="luxVal">–</div><div class="muted" style="font-size:11px">Lux capteur</div></div>
+      </div>
+    </div>
+    <div class="reveal card" style="padding:22px">
+      <div class="section-title" style="font-size:18px;margin-bottom:14px"><span class="ic" style="background:#e9f3fb;color:var(--blue)"><i class="fas fa-cloud-sun"></i></span> Environnement</div>
+      <div id="envGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:13px"></div>
+    </div>
+  </div>
+
+  <!-- Prediction -->
+  <div class="reveal card" id="predSec" style="padding:22px;margin-top:26px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+      <div class="section-title"><span class="ic" style="background:#efe9fb;color:#7c5cd6"><i class="fas fa-brain"></i></span> Prédiction de production (IA)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="pill" style="background:#f0ecfb;color:#6b46c1">Random Forest · R² <b id="rfr2">–</b></span>
+        <span class="pill" style="background:var(--mint);color:var(--green-d)">Modèle embarqué · R² <b id="plr2">–</b></span>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Le modèle apprend la relation entre conditions solaires/météo et puissance produite. Comparaison mesuré vs prédit sur la fenêtre suivie.</p>
+    <canvas id="predChart" height="110"></canvas>
+    <div id="featImp" style="margin-top:16px"></div>
+  </div>
+
+  <!-- System architecture: cooling + storage -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px" id="archCol">
+    <div class="reveal card" style="padding:22px">
+      <div class="section-title" style="font-size:18px;margin-bottom:12px"><span class="ic" style="background:#e9f3fb;color:var(--blue)"><i class="fas fa-droplet"></i></span> Refroidissement hygroscopique</div>
+      <div id="coolBox"></div>
+    </div>
+    <div class="reveal card" style="padding:22px">
+      <div class="section-title" style="font-size:18px;margin-bottom:12px"><span class="ic" style="background:var(--mint);color:var(--green)"><i class="fas fa-car-battery"></i></span> Stockage hybride</div>
+      <div id="storeBox"></div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="reveal card" style="padding:22px;margin-top:26px">
+    <div class="section-title" style="font-size:18px;margin-bottom:14px"><span class="ic" style="background:#fdeceb;color:var(--red)"><i class="fas fa-bell"></i></span> Alertes &amp; maintenance</div>
+    <div id="alertsBox" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <footer style="text-align:center;margin-top:40px;color:var(--ink-faint);font-size:12.5px">
+    <p><b style="color:var(--green-deep)">DURASIA</b> — École Centrale Casablanca · Projet Learning By Doing 2025-2026</p>
+    <p style="margin-top:4px">Raspberry Pi · ADS1115 · DS18B20 · Stockage hybride · IA embarquée</p>
+  </footer>
+</main>
+</div>
+
+<!-- ============ FAB + WINDOWS ============ -->
+<button class="fab" style="bottom:24px;right:24px;background:linear-gradient(135deg,var(--green),var(--green-d))" onclick="toggleWin('chat')" title="Assistant IA"><i class="fas fa-comment-dots"></i></button>
+<button class="fab" style="bottom:24px;right:92px;background:linear-gradient(135deg,var(--amber),var(--amber-d))" onclick="toggleWin('insp')" title="Inspection panneau IA"><i class="fas fa-magnifying-glass-chart"></i></button>
+
+<!-- chatbot -->
+<div id="chatWin" class="fwin" style="bottom:96px;right:24px;width:380px;max-height:74vh">
+  <div style="background:linear-gradient(135deg,#13301f,#1c5234);padding:15px 17px;border-radius:24px 24px 0 0;display:flex;justify-content:space-between;align-items:center">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:11px;background:rgba(243,168,51,.2);display:grid;place-items:center"><i class="fas fa-robot" style="color:var(--amber)"></i></div>
+      <div><div style="color:#fff;font-weight:700;font-size:14px">Assistant DURASIA</div><div style="color:rgba(255,255,255,.55);font-size:11px">IA photovoltaïque</div></div>
+    </div>
+    <button onclick="toggleWin('chat')" style="width:30px;height:30px;border-radius:9px;border:none;background:rgba(255,255,255,.12);color:#fff;cursor:pointer"><i class="fas fa-times"></i></button>
+  </div>
+  <div id="chatMsgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--surface-2);min-height:200px"></div>
+  <div style="padding:12px;border-top:1px solid var(--line);background:#fff;border-radius:0 0 24px 24px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px" id="quickChips"></div>
+    <div style="display:flex;gap:8px">
+      <input id="chatInput" placeholder="Posez votre question…" onkeypress="if(event.key==='Enter')sendChat()" style="flex:1;padding:11px 14px;border:1px solid var(--line-2);border-radius:13px;font-size:13.5px;outline:none;background:var(--surface-2)">
+      <button onclick="sendChat()" style="width:42px;border:none;border-radius:13px;background:var(--green);color:#fff;cursor:pointer"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- inspection -->
+<div id="inspWin" class="fwin" style="bottom:96px;right:92px;width:400px;max-height:80vh">
+  <div style="background:linear-gradient(135deg,var(--amber-d),#b9700a);padding:15px 17px;border-radius:24px 24px 0 0;display:flex;justify-content:space-between;align-items:center">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center"><i class="fas fa-magnifying-glass-chart" style="color:#fff"></i></div>
+      <div><div style="color:#fff;font-weight:700;font-size:14px">Inspection panneau IA</div><div style="color:rgba(255,255,255,.7);font-size:11px">Détection des dommages</div></div>
+    </div>
+    <button onclick="toggleWin('insp')" style="width:30px;height:30px;border-radius:9px;border:none;background:rgba(255,255,255,.18);color:#fff;cursor:pointer"><i class="fas fa-times"></i></button>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:16px;background:var(--surface-2)" id="inspBody">
+    <div id="inspDrop" onclick="document.getElementById('inspFile').click()" style="border:2px dashed #f0c98a;border-radius:16px;padding:30px 18px;text-align:center;cursor:pointer;background:#fffdf8;transition:.3s">
+      <div style="width:54px;height:54px;border-radius:16px;background:var(--amber-soft);display:grid;place-items:center;margin:0 auto 12px"><i class="fas fa-cloud-arrow-up" style="color:var(--amber-d);font-size:22px"></i></div>
+      <div style="font-weight:600;color:var(--green-deep);font-size:14px">Uploader une photo du panneau</div>
+      <div class="muted" style="font-size:12px;margin-top:4px">Cliquez pour choisir · JPG, PNG</div>
+      <input type="file" id="inspFile" accept="image/*" style="display:none" onchange="onInspFile(event)">
+    </div>
+    <div id="inspResult"></div>
+  </div>
+</div>
+
+<!-- settings modal -->
+<div id="settingsModal" class="modal">
+  <div class="modal-bg" onclick="closeSettings()"></div>
+  <div class="card" style="position:relative;width:100%;max-width:460px;padding:26px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <h3 style="font-size:19px;color:var(--green-deep);font-weight:800">Réglages</h3>
+      <button onclick="closeSettings()" style="width:32px;height:32px;border-radius:10px;border:none;background:var(--mint);cursor:pointer"><i class="fas fa-times"></i></button>
+    </div>
+    <label class="muted" style="font-size:13px;font-weight:600"><i class="fas fa-wifi"></i> URL API Raspberry Pi (mode Live)</label>
+    <input id="apiUrl" placeholder="http://192.168.1.50:5000/api/latest" style="width:100%;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;margin:7px 0 16px;outline:none;font-size:13px;background:var(--surface-2)">
+    <label class="muted" style="font-size:13px;font-weight:600"><i class="fas fa-key"></i> Clé API Anthropic (assistant + inspection)</label>
+    <input id="anthKey" type="password" placeholder="sk-ant-… (optionnel)" style="width:100%;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;margin:7px 0 6px;outline:none;font-size:13px;background:var(--surface-2)">
+    <p class="muted" style="font-size:11.5px;margin-bottom:18px">Sans clé, l'assistant répond en mode hors-ligne à partir des données du système.</p>
+    <button class="btn btn-pri" style="width:100%;justify-content:center" onclick="saveSettings()"><i class="fas fa-check"></i> Enregistrer</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"><i class="fas fa-circle-check"></i><span id="toastMsg"></span></div>
+
+<script>
+const DATA = {"meta": {"location": "Béni Mellal, Maroc", "lat": 32.34, "lon": -6.36, "period_start": "2026-06-14 18:00:48", "period_end": "2026-06-16 19:36:50", "n_samples": 14565, "panel": "Module PV monocristallin ~60 W (prototype DURASIA)"}, "kpis": {"peak_power_W": 59.0, "avg_power_W": 12.6, "energy_total_Wh": 112.3, "max_temp_C": 50.1, "avg_temp_C": 32.6, "max_voltage_V": 19.0, "nominal_voltage_V": 18.4, "max_current_A": 3.19, "peak_lux": 2142.0, "peak_ghi_Wm2": 991.0}, "day_profile": [{"time": "11:35", "p": 11.0, "v": 18.7, "i": 0.59, "temp": 23.5, "lux": 100.0, "ghi": 888.0, "elev": 63.4}, {"time": "11:40", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 23.7, "lux": 100.0, "ghi": 894.0, "elev": 64.1}, {"time": "11:45", "p": 11.0, "v": 18.4, "i": 0.6, "temp": 23.9, "lux": 104.0, "ghi": 902.0, "elev": 65.1}, {"time": "11:50", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 24.1, "lux": 114.0, "ghi": 911.0, "elev": 66.1}, {"time": "11:55", "p": 10.7, "v": 18.4, "i": 0.58, "temp": 24.1, "lux": 120.0, "ghi": 918.0, "elev": 67.1}, {"time": "12:00", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 24.4, "lux": 123.0, "ghi": 926.0, "elev": 68.1}, {"time": "12:05", "p": 10.9, "v": 18.4, "i": 0.59, "temp": 24.7, "lux": 127.0, "ghi": 933.0, "elev": 69.0}, {"time": "12:10", "p": 10.9, "v": 18.4, "i": 0.59, "temp": 25.0, "lux": 132.0, "ghi": 939.0, "elev": 70.0}, {"time": "12:15", "p": 10.4, "v": 18.5, "i": 0.56, "temp": 25.2, "lux": 133.0, "ghi": 946.0, "elev": 70.9}, {"time": "12:20", "p": 10.4, "v": 18.5, "i": 0.57, "temp": 25.2, "lux": 136.0, "ghi": 951.0, "elev": 71.8}, {"time": "12:25", "p": 10.9, "v": 18.4, "i": 0.59, "temp": 25.2, "lux": 133.0, "ghi": 957.0, "elev": 72.7}, {"time": "12:30", "p": 11.2, "v": 18.5, "i": 0.61, "temp": 25.2, "lux": 137.0, "ghi": 962.0, "elev": 73.6}, {"time": "12:35", "p": 11.1, "v": 18.5, "i": 0.6, "temp": 25.3, "lux": 138.0, "ghi": 967.0, "elev": 74.5}, {"time": "12:40", "p": 10.8, "v": 18.4, "i": 0.58, "temp": 25.3, "lux": 123.0, "ghi": 971.0, "elev": 75.3}, {"time": "12:45", "p": 11.0, "v": 18.4, "i": 0.6, "temp": 25.1, "lux": 112.0, "ghi": 975.0, "elev": 76.1}, {"time": "12:50", "p": 10.6, "v": 18.4, "i": 0.58, "temp": 25.0, "lux": 103.0, "ghi": 978.0, "elev": 76.8}, {"time": "12:55", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 24.9, "lux": 112.0, "ghi": 981.0, "elev": 77.5}, {"time": "13:00", "p": 11.9, "v": 18.5, "i": 0.64, "temp": 25.3, "lux": 121.0, "ghi": 984.0, "elev": 78.1}, {"time": "13:05", "p": 10.6, "v": 18.4, "i": 0.58, "temp": 25.6, "lux": 91.0, "ghi": 986.0, "elev": 78.6}, {"time": "13:10", "p": 11.2, "v": 18.5, "i": 0.61, "temp": 25.7, "lux": 97.0, "ghi": 988.0, "elev": 79.1}, {"time": "13:15", "p": 11.3, "v": 18.4, "i": 0.61, "temp": 25.9, "lux": 93.0, "ghi": 989.0, "elev": 79.5}, {"time": "13:20", "p": 10.4, "v": 18.4, "i": 0.57, "temp": 26.0, "lux": 87.0, "ghi": 990.0, "elev": 79.7}, {"time": "13:25", "p": 10.4, "v": 18.4, "i": 0.57, "temp": 25.9, "lux": 77.0, "ghi": 991.0, "elev": 79.9}, {"time": "13:30", "p": 10.8, "v": 18.4, "i": 0.59, "temp": 25.7, "lux": 64.0, "ghi": 991.0, "elev": 79.9}, {"time": "13:35", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 25.7, "lux": 65.0, "ghi": 990.0, "elev": 79.8}, {"time": "13:40", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 25.7, "lux": 66.0, "ghi": 990.0, "elev": 79.6}, {"time": "13:45", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.7, "lux": 71.0, "ghi": 989.0, "elev": 79.3}, {"time": "13:50", "p": 10.7, "v": 18.4, "i": 0.58, "temp": 25.7, "lux": 65.0, "ghi": 987.0, "elev": 78.9}, {"time": "13:55", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.5, "lux": 71.0, "ghi": 985.0, "elev": 78.4}, {"time": "14:00", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.6, "lux": 74.0, "ghi": 983.0, "elev": 77.8}, {"time": "14:05", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 25.7, "lux": 69.0, "ghi": 980.0, "elev": 77.2}, {"time": "14:10", "p": 10.9, "v": 18.4, "i": 0.59, "temp": 25.8, "lux": 72.0, "ghi": 977.0, "elev": 76.5}, {"time": "14:15", "p": 10.9, "v": 18.4, "i": 0.59, "temp": 25.9, "lux": 70.0, "ghi": 973.0, "elev": 75.7}, {"time": "14:20", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 25.8, "lux": 71.0, "ghi": 969.0, "elev": 74.9}, {"time": "14:25", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.8, "lux": 73.0, "ghi": 965.0, "elev": 74.1}, {"time": "14:30", "p": 10.0, "v": 18.3, "i": 0.55, "temp": 25.7, "lux": 66.0, "ghi": 960.0, "elev": 73.2}, {"time": "14:35", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.5, "lux": 78.0, "ghi": 954.0, "elev": 72.3}, {"time": "14:40", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.5, "lux": 82.0, "ghi": 949.0, "elev": 71.4}, {"time": "14:45", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.4, "lux": 88.0, "ghi": 943.0, "elev": 70.5}, {"time": "14:50", "p": 11.4, "v": 18.4, "i": 0.62, "temp": 25.5, "lux": 97.0, "ghi": 936.0, "elev": 69.6}, {"time": "14:55", "p": 10.9, "v": 18.4, "i": 0.59, "temp": 25.6, "lux": 92.0, "ghi": 930.0, "elev": 68.6}, {"time": "15:00", "p": 11.4, "v": 18.4, "i": 0.62, "temp": 25.7, "lux": 103.0, "ghi": 922.0, "elev": 67.6}, {"time": "15:05", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 25.7, "lux": 91.0, "ghi": 915.0, "elev": 66.7}, {"time": "15:10", "p": 11.0, "v": 18.4, "i": 0.6, "temp": 25.5, "lux": 90.0, "ghi": 907.0, "elev": 65.7}, {"time": "15:15", "p": 11.1, "v": 18.4, "i": 0.6, "temp": 25.6, "lux": 98.0, "ghi": 898.0, "elev": 64.7}, {"time": "15:20", "p": 11.0, "v": 18.4, "i": 0.6, "temp": 25.6, "lux": 89.0, "ghi": 890.0, "elev": 63.7}, {"time": "15:25", "p": 11.4, "v": 18.4, "i": 0.62, "temp": 25.5, "lux": 94.0, "ghi": 881.0, "elev": 62.7}, {"time": "15:30", "p": 11.8, "v": 18.4, "i": 0.64, "temp": 25.4, "lux": 90.0, "ghi": 871.0, "elev": 61.7}, {"time": "15:35", "p": 11.5, "v": 18.4, "i": 0.62, "temp": 25.3, "lux": 89.0, "ghi": 861.0, "elev": 60.6}, {"time": "15:40", "p": 11.2, "v": 18.4, "i": 0.61, "temp": 25.2, "lux": 88.0, "ghi": 851.0, "elev": 59.6}, {"time": "15:45", "p": 11.9, "v": 18.4, "i": 0.65, "temp": 25.4, "lux": 268.0, "ghi": 841.0, "elev": 58.6}, {"time": "15:50", "p": 10.6, "v": 18.4, "i": 0.58, "temp": 30.7, "lux": 2091.0, "ghi": 830.0, "elev": 57.6}, {"time": "15:55", "p": 6.5, "v": 18.4, "i": 0.35, "temp": 39.5, "lux": 2043.0, "ghi": 819.0, "elev": 56.5}, {"time": "16:00", "p": 5.8, "v": 18.3, "i": 0.32, "temp": 44.4, "lux": 2037.0, "ghi": 807.0, "elev": 55.5}, {"time": "16:05", "p": 5.4, "v": 18.3, "i": 0.3, "temp": 46.9, "lux": 1976.0, "ghi": 795.0, "elev": 54.5}, {"time": "16:10", "p": 3.8, "v": 18.3, "i": 0.21, "temp": 48.3, "lux": 1875.0, "ghi": 783.0, "elev": 53.4}, {"time": "16:15", "p": 2.2, "v": 18.3, "i": 0.12, "temp": 48.6, "lux": 1838.0, "ghi": 771.0, "elev": 52.4}, {"time": "16:20", "p": 2.3, "v": 18.3, "i": 0.12, "temp": 49.4, "lux": 1847.0, "ghi": 758.0, "elev": 51.3}, {"time": "16:25", "p": 2.1, "v": 18.3, "i": 0.12, "temp": 49.6, "lux": 1864.0, "ghi": 745.0, "elev": 50.3}, {"time": "16:30", "p": 2.2, "v": 18.3, "i": 0.12, "temp": 48.6, "lux": 1857.0, "ghi": 732.0, "elev": 49.3}, {"time": "16:35", "p": 2.5, "v": 18.3, "i": 0.14, "temp": 48.1, "lux": 1780.0, "ghi": 718.0, "elev": 48.2}, {"time": "16:40", "p": 4.4, "v": 18.3, "i": 0.24, "temp": 47.3, "lux": 1713.0, "ghi": 704.0, "elev": 47.2}, {"time": "16:45", "p": 5.6, "v": 18.3, "i": 0.31, "temp": 47.5, "lux": 1745.0, "ghi": 690.0, "elev": 46.1}, {"time": "16:50", "p": 5.5, "v": 18.3, "i": 0.3, "temp": 48.0, "lux": 1825.0, "ghi": 675.0, "elev": 45.1}, {"time": "16:55", "p": 5.1, "v": 18.3, "i": 0.28, "temp": 46.7, "lux": 1872.0, "ghi": 660.0, "elev": 44.0}, {"time": "17:00", "p": 4.7, "v": 18.3, "i": 0.26, "temp": 48.0, "lux": 1862.0, "ghi": 646.0, "elev": 43.0}, {"time": "17:05", "p": 4.4, "v": 18.3, "i": 0.24, "temp": 48.2, "lux": 1828.0, "ghi": 630.0, "elev": 42.0}, {"time": "17:10", "p": 4.3, "v": 18.3, "i": 0.23, "temp": 46.0, "lux": 1781.0, "ghi": 615.0, "elev": 40.9}, {"time": "17:15", "p": 5.8, "v": 18.3, "i": 0.32, "temp": 46.3, "lux": 1775.0, "ghi": 599.0, "elev": 39.9}, {"time": "17:20", "p": 6.0, "v": 18.3, "i": 0.33, "temp": 45.2, "lux": 1777.0, "ghi": 583.0, "elev": 38.8}, {"time": "17:25", "p": 5.7, "v": 18.3, "i": 0.31, "temp": 45.4, "lux": 1768.0, "ghi": 567.0, "elev": 37.8}, {"time": "17:30", "p": 5.9, "v": 18.3, "i": 0.32, "temp": 44.5, "lux": 1734.0, "ghi": 551.0, "elev": 36.8}, {"time": "17:35", "p": 6.2, "v": 18.3, "i": 0.34, "temp": 43.4, "lux": 1623.0, "ghi": 535.0, "elev": 35.7}, {"time": "17:40", "p": 5.9, "v": 18.3, "i": 0.32, "temp": 40.8, "lux": 1329.0, "ghi": 521.0, "elev": 34.9}, {"time": "17:45", "p": 9.5, "v": 18.3, "i": 0.52, "temp": 40.0, "lux": 1317.0, "ghi": 501.0, "elev": 33.7}, {"time": "17:50", "p": 18.9, "v": 16.3, "i": 1.26, "temp": 43.5, "lux": 749.0, "ghi": 484.0, "elev": 32.6}, {"time": "17:55", "p": 26.7, "v": 18.6, "i": 1.44, "temp": 42.9, "lux": 1121.0, "ghi": 467.0, "elev": 31.6}, {"time": "18:00", "p": 26.2, "v": 18.6, "i": 1.41, "temp": 44.5, "lux": 1638.0, "ghi": 450.0, "elev": 30.6}, {"time": "18:05", "p": 26.4, "v": 18.6, "i": 1.42, "temp": 45.3, "lux": 1653.0, "ghi": 433.0, "elev": 29.5}, {"time": "18:10", "p": 24.8, "v": 18.6, "i": 1.33, "temp": 44.6, "lux": 1588.0, "ghi": 415.0, "elev": 28.5}, {"time": "18:15", "p": 24.3, "v": 18.6, "i": 1.31, "temp": 44.5, "lux": 1548.0, "ghi": 397.0, "elev": 27.5}, {"time": "18:20", "p": 24.0, "v": 18.6, "i": 1.29, "temp": 43.8, "lux": 1001.0, "ghi": 380.0, "elev": 26.5}, {"time": "18:25", "p": 23.9, "v": 18.6, "i": 1.29, "temp": 42.3, "lux": 614.0, "ghi": 362.0, "elev": 25.5}, {"time": "18:30", "p": 24.1, "v": 18.6, "i": 1.3, "temp": 39.7, "lux": 300.0, "ghi": 344.0, "elev": 24.4}, {"time": "18:35", "p": 22.4, "v": 18.5, "i": 1.21, "temp": 36.4, "lux": 195.0, "ghi": 327.0, "elev": 23.4}, {"time": "18:40", "p": 22.1, "v": 18.5, "i": 1.19, "temp": 32.0, "lux": 176.0, "ghi": 309.0, "elev": 22.4}, {"time": "18:45", "p": 21.7, "v": 18.5, "i": 1.17, "temp": 28.8, "lux": 161.0, "ghi": 291.0, "elev": 21.4}, {"time": "18:50", "p": 22.4, "v": 18.5, "i": 1.21, "temp": 27.1, "lux": 160.0, "ghi": 273.0, "elev": 20.4}, {"time": "18:55", "p": 22.8, "v": 18.5, "i": 1.23, "temp": 26.0, "lux": 151.0, "ghi": 255.0, "elev": 19.4}, {"time": "19:00", "p": 23.2, "v": 18.5, "i": 1.25, "temp": 25.4, "lux": 125.0, "ghi": 238.0, "elev": 18.4}, {"time": "19:05", "p": 27.7, "v": 18.4, "i": 1.5, "temp": 24.6, "lux": 97.0, "ghi": 220.0, "elev": 17.4}, {"time": "19:10", "p": 46.5, "v": 18.3, "i": 2.55, "temp": 24.1, "lux": 65.0, "ghi": 203.0, "elev": 16.4}, {"time": "19:15", "p": 40.7, "v": 17.8, "i": 2.28, "temp": 23.8, "lux": 52.0, "ghi": 185.0, "elev": 15.4}, {"time": "19:20", "p": 38.1, "v": 16.4, "i": 2.32, "temp": 23.4, "lux": 32.0, "ghi": 168.0, "elev": 14.4}, {"time": "19:25", "p": 39.2, "v": 16.7, "i": 2.34, "temp": 23.1, "lux": 34.0, "ghi": 151.0, "elev": 13.5}, {"time": "19:30", "p": 39.2, "v": 16.8, "i": 2.33, "temp": 23.0, "lux": 35.0, "ghi": 134.0, "elev": 12.5}, {"time": "19:35", "p": 37.1, "v": 16.0, "i": 2.32, "temp": 22.9, "lux": 27.0, "ghi": 123.0, "elev": 11.8}], "hourly": [{"hour": 11, "p": 11.1, "temp": 23.9, "lux": 107.0, "ghi": 902.0}, {"hour": 12, "p": 10.9, "temp": 25.0, "lux": 126.0, "ghi": 957.0}, {"hour": 13, "p": 11.0, "temp": 25.7, "lux": 81.0, "ghi": 988.0}, {"hour": 14, "p": 10.9, "temp": 25.7, "lux": 77.0, "ghi": 959.0}, {"hour": 15, "p": 10.9, "temp": 27.1, "lux": 436.0, "ghi": 874.0}, {"hour": 16, "p": 3.3, "temp": 44.7, "lux": 1560.0, "ghi": 737.0}, {"hour": 17, "p": 8.6, "temp": 44.3, "lux": 1531.0, "ghi": 558.0}, {"hour": 18, "p": 16.6, "temp": 37.6, "lux": 786.0, "ghi": 362.0}, {"hour": 19, "p": 36.4, "temp": 23.9, "lux": 61.0, "ghi": 182.0}, {"hour": 22, "p": 0.0, "temp": 26.4, "lux": 11.0, "ghi": 0.0}], "ml": {"features": ["solar_elevation_deg", "ciel_clair_ghi_Wm2", "lux", "temp_C", "airmass_abs", "temp_air_C_model", "humidite_rel_pct_model", "vent_ms_model"], "rf_r2": 0.963, "rf_mae": 0.55, "poly_r2": 0.901, "poly_mae": 1.55, "importances": {"solar_elevation_deg": 0.255, "ciel_clair_ghi_Wm2": 0.242, "lux": 0.117, "temp_C": 0.059, "airmass_abs": 0.308, "temp_air_C_model": 0.005, "humidite_rel_pct_model": 0.004, "vent_ms_model": 0.009}, "embed": {"keyf": ["solar_elevation_deg", "ciel_clair_ghi_Wm2", "lux", "temp_C", "airmass_abs"], "powers": [[0, 0, 0, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 1, 0], [0, 0, 0, 0, 1], [2, 0, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 1, 0, 0], [1, 0, 0, 1, 0], [1, 0, 0, 0, 1], [0, 2, 0, 0, 0], [0, 1, 1, 0, 0], [0, 1, 0, 1, 0], [0, 1, 0, 0, 1], [0, 0, 2, 0, 0], [0, 0, 1, 1, 0], [0, 0, 1, 0, 1], [0, 0, 0, 2, 0], [0, 0, 0, 1, 1], [0, 0, 0, 0, 2], [3, 0, 0, 0, 0], [2, 1, 0, 0, 0], [2, 0, 1, 0, 0], [2, 0, 0, 1, 0], [2, 0, 0, 0, 1], [1, 2, 0, 0, 0], [1, 1, 1, 0, 0], [1, 1, 0, 1, 0], [1, 1, 0, 0, 1], [1, 0, 2, 0, 0], [1, 0, 1, 1, 0], [1, 0, 1, 0, 1], [1, 0, 0, 2, 0], [1, 0, 0, 1, 1], [1, 0, 0, 0, 2], [0, 3, 0, 0, 0], [0, 2, 1, 0, 0], [0, 2, 0, 1, 0], [0, 2, 0, 0, 1], [0, 1, 2, 0, 0], [0, 1, 1, 1, 0], [0, 1, 1, 0, 1], [0, 1, 0, 2, 0], [0, 1, 0, 1, 1], [0, 1, 0, 0, 2], [0, 0, 3, 0, 0], [0, 0, 2, 1, 0], [0, 0, 2, 0, 1], [0, 0, 1, 2, 0], [0, 0, 1, 1, 1], [0, 0, 1, 0, 2], [0, 0, 0, 3, 0], [0, 0, 0, 2, 1], [0, 0, 0, 1, 2], [0, 0, 0, 0, 3]], "coef": [3.6610646368950343e-06, -0.3372599382767146, -9.015423791875735, 3.1885505450559486, -0.17779705895813194, -0.08257288549136126, 11.553508205442759, -0.7218634619688379, 0.58509091786582, -0.5664135786026298, 0.7887667230109607, 0.005581525733333059, -0.04046401411992216, 0.287072037017531, 10.453344488494604, 0.0003048647083807885, -0.018043425695901106, -1.2828809939645462, 0.27547315456422555, -1.9041927533450713, -0.8597423935958163, -0.24402433419211444, 0.036342146177816094, 0.0027313592696347226, -0.23714160875093718, 18.329860268379928, -0.002299307347916786, -0.0007833127242618254, 0.03654189602783353, -2.861776811113327, -2.500586444020847e-06, -8.358929653598524e-05, -0.21316189291780702, -0.052572018785436825, 4.040260034315946, -3.8309013933238445, 6.443604062233987e-05, 4.080167735542872e-05, -0.001598339942113336, 0.10438721818327634, -8.822404090613745e-08, 1.7903827411736017e-05, 0.012934263581793282, 0.0037890432421061604, -0.3578024178240262, -0.3904721725189837, 2.787731823161721e-09, -2.0917250687091382e-07, -9.19826932026524e-05, 5.5175600163437366e-05, 0.004409393605648404, 0.2614030162677513, -0.005485267906053082, 0.07251836842894499, -1.840236623022664, 3.4985053846891767], "intercept": -3709.1214875250153}}};
+</script>
+<script src="app.js"></script>
+</body>
+</html>
